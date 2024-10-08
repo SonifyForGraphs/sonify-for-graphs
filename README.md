@@ -1,6 +1,6 @@
 # sonify-for-graphs
 
-install instructions to get set up\
+install instructions to get set up
 1. cd into the folder
 2. python3 -m venv venv
 3. source venv/bin/activate
