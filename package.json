@@ -8,7 +8,8 @@
     "dev": "concurrently \"npm run next-dev\" \"npm run fastapi-dev\"",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "setup": "python3 -m venv venv && source venv/bin/activate"
   },
   "dependencies": {
     "@radix-ui/react-icons": "^1.3.0",
