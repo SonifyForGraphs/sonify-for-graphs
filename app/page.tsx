@@ -46,7 +46,7 @@ export default function Home() {
         <div className="bg-white p-6 rounded shadow text-center">
           <h3 className="text-2xl font-bold mb-4">Choose Sonification Style</h3>
           <p className="text-gray-600">
-            Select from a variety of sonification styles, including "Left to Right", "Expanding Circles", and more.
+            Select from a variety of sonification styles, including &quot;Left to Right&quot;, &quot;Expanding Circles&quot;, and more.
           </p>
         </div>
         <div className="bg-white p-6 rounded shadow text-center">
