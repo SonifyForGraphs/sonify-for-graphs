@@ -23,7 +23,9 @@ export default function RootLayout({
         <title>{metadata.title}</title>
       </head>
       <body className={inter.className}>
-        <Layout>{children}</Layout> {/* applying the custom layout */}
+        {/*<Layout>{children}</Layout> {/* applying the custom layout */}
+        {children}
+        
       </body>
     </html>
   );
