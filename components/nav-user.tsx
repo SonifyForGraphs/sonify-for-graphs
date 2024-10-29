@@ -26,6 +26,9 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { signOut } from '@/app/login/actions';
+import { createClient } from '@/utils/supabase/client';
+import { useState, useEffect } from 'react';
+import WebsiteIcon from './website-icon';
 
 export function NavUser({
   user,
@@ -37,7 +40,19 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
-
+  const supabase = createClient();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  useEffect(() => {
+    supabase.auth.getSession().then((session) => {
+      if (session.data.session?.user) {
+        setName(session.data.session.user.user_metadata['full_name']);
+        setEmail(
+          session.data.session.user.email ? session.data.session.user.email : ''
+        );
+      }
+    });
+  }, [supabase.auth]);
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -48,12 +63,12 @@ export function NavUser({
               className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
             >
               <Avatar className='h-8 w-8 rounded-lg'>
-                <AvatarImage src={user.avatar} alt={user.name} />
+                <WebsiteIcon />
                 <AvatarFallback className='rounded-lg'>CN</AvatarFallback>
               </Avatar>
               <div className='grid flex-1 text-left text-sm leading-tight'>
-                <span className='truncate font-semibold'>{user.name}</span>
-                <span className='truncate text-xs'>{user.email}</span>
+                <span className='truncate font-semibold'>{name}</span>
+                <span className='truncate text-xs'>{email}</span>
               </div>
               <ChevronsUpDown className='ml-auto size-4' />
             </SidebarMenuButton>
@@ -71,8 +86,8 @@ export function NavUser({
                   <AvatarFallback className='rounded-lg'>CN</AvatarFallback>
                 </Avatar>
                 <div className='grid flex-1 text-left text-sm leading-tight'>
-                  <span className='truncate font-semibold'>{user.name}</span>
-                  <span className='truncate text-xs'>{user.email}</span>
+                  <span className='truncate font-semibold'>{name}</span>
+                  <span className='truncate text-xs'>{email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
