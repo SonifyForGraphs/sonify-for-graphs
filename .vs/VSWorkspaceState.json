@@ -1,7 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\sonification-proof-of-concepts",
+    "\\sonification-proof-of-concepts\\imagesonify",
+    "\\sonification-proof-of-concepts\\mathsonify"
   ],
-  "SelectedNode": "\\README.md",
+  "SelectedNode": "\\tailwind.config.js",
   "PreviewInSolutionExplorer": false
 }

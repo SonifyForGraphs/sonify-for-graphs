@@ -5,7 +5,7 @@ export default function Layout({ children }) {
     <div className="container">
       <header>
         <nav>
-          <h1>Sonify for Graphs</h1>
+          <h1>Soundviz</h1>
           <ul>
             <li>
               {/* link without <a> */}

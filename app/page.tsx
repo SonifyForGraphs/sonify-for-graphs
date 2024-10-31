@@ -7,7 +7,7 @@ export default function Home() {
       {/* header */}
       <header className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white p-6 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Sonify for Graphs</h1>
+          <h1 className="text-2xl font-bold">Soundviz</h1>
           <nav className="space-x-4">
             <Link href="/login" className="px-4 py-2 bg-white text-blue-600 rounded hover:bg-gray-200">
               Sign In
@@ -22,7 +22,7 @@ export default function Home() {
       {/* hero */}
       <section className="flex flex-col items-center justify-center bg-gray-100 py-20">
         <div className="text-center max-w-2xl">
-          <h2 className="text-4xl font-extrabold mb-4">Convert Data Into Sound with Sonify for Graphs</h2>
+          <h2 className="text-4xl font-extrabold mb-4">Convert Data Into Sound with Soundviz</h2>
           <p className="text-gray-700 text-lg mb-6">
             Upload your graphs or data, choose your sonification preferences, and experience data like never before.
           </p>
@@ -59,7 +59,7 @@ export default function Home() {
 
       {/* footer */}
       <footer className="bg-gray-800 text-white py-4 text-center">
-        <p>&copy; {new Date().getFullYear()} Sonify for Graphs. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Soundviz. All rights reserved.</p>
       </footer>
     </main>
   );
