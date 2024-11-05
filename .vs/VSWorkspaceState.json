@@ -1,10 +1,11 @@
 {
   "ExpandedNodes": [
     "",
-    "\\sonification-proof-of-concepts",
-    "\\sonification-proof-of-concepts\\imagesonify",
-    "\\sonification-proof-of-concepts\\mathsonify"
+    "\\app",
+    "\\app\\dashboard",
+    "\\app\\error",
+    "\\components"
   ],
-  "SelectedNode": "\\tailwind.config.js",
+  "SelectedNode": "\\app\\dashboard\\page.tsx",
   "PreviewInSolutionExplorer": false
 }

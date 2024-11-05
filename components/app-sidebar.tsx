@@ -99,14 +99,10 @@ const data = {
       items: [
         {
           title: 'General',
-          url: '#',
+          url: 'Settings',
         },
         {
           title: 'Team',
-          url: '#',
-        },
-        {
-          title: 'Billing',
           url: '#',
         },
         {
