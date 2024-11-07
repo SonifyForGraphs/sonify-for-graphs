@@ -67,6 +67,7 @@ export function Canvas() {
             image.width,
             image.height
           );
+
           const pixels: number[][][] = [];
           // y in outer loop instead of x to simulate y going down the page and x going across the page
           // origin still in top corner
@@ -87,6 +88,7 @@ export function Canvas() {
             }
             pixels.push(row);
           }
+          console.log(imageData);
           // populating the pixel array and visit refs for later sound and BFS
           pixelArrayRef.current = pixels;
           // fill grid with false since none have been visited yet
@@ -98,6 +100,7 @@ export function Canvas() {
         image.onerror = (error) =>
           console.error('error loading the image: ', error);
       }
+
     }
   }, []);
   const startBFS = useCallback(
