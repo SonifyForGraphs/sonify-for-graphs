@@ -20,7 +20,7 @@ app.add_middleware(
   allow_headers=['*'],
 )
 
-# NOTES
+# NOTES s
 # COMMENTS = NEED TO ERROR CHECK = NEED TO TEST THIS TO MAKE SURE PROGRAM DOESN'T CRASH
 
 # math sonification configuration
