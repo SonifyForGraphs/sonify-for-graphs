@@ -1,3 +1,4 @@
+'use client';
 import { AppSidebar } from '@/components/app-sidebar';
 import {
   Breadcrumb,
@@ -7,6 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
   SidebarInset,
@@ -39,6 +41,29 @@ export default function Page() {
           </div>
         </header>
         <div className='flex flex-1 flex-col gap-4 p-4 pt-0'>
+          <Button
+            onClick={async () => {
+              const config = {
+                function: 'x'
+              };
+              try {
+                const response = await fetch('http://localhost:8000/math', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(config),
+                });
+
+                const data = await response.json();
+                console.log('math:', data.result);
+              } catch (error) {
+                console.log('Sup Error:', error);
+              }
+            }}
+          >
+            Test Math Sonify
+          </Button>
           <div className='grid auto-rows-min gap-4 md:grid-cols-3'>
             <div className='aspect-video rounded-xl bg-muted/50' />
             <div className='aspect-video rounded-xl bg-muted/50' />
