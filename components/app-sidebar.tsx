@@ -28,7 +28,6 @@ import {
 
 // This is sample data.
 const data = {
-  
   navMain: [
     {
       title: 'Playground',
@@ -99,7 +98,7 @@ const data = {
       items: [
         {
           title: 'General',
-          url: 'Settings',
+          url: 'settings',
         },
         {
           title: 'Team',
@@ -142,7 +141,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser/>
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
