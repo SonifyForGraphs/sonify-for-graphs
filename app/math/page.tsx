@@ -41,10 +41,10 @@ export default function Page() {
           </div>
         </header>
         <div className='flex flex-1 flex-col gap-4 p-4 pt-0'>
-        <Button
+          <Button
             onClick={async () => {
               const config = {
-                function: 'x'
+                function: 'x',
               };
               try {
                 const response = await fetch('http://localhost:8000/math', {

@@ -4,6 +4,9 @@ import numpy as np
 from pydantic import BaseModel
 
 
+# NOTES
+# COMMENTS = NEED TO ERROR CHECK = NEED TO TEST THIS TO MAKE SURE PROGRAM DOESN'T CRASH
+
 class MathWaveSonificationConfig(BaseModel):
   # base wave function
   function: str # string but will be parsed by sympy into a usable expression

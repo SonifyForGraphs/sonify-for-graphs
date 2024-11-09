@@ -18,23 +18,15 @@ app.add_middleware(
   allow_headers=['*'],
 )
 
-# NOTES
-# COMMENTS = NEED TO ERROR CHECK = NEED TO TEST THIS TO MAKE SURE PROGRAM DOESN'T CRASH
-
-
 @app.post('/math')
 async def math(config: MathWaveSonificationConfig):
   # run video creation
   try:
-    await math_wave_sonify(config=config)
+    # need better error handling here
+    # if an invalid function is provided, the entire operation crashes
+    res = await math_wave_sonify(config=config)
   except:
     print("Error")
-  print('here')
 
-
-  # upload video to supabase
-
-  # return link to video
-  
-  return {"result": "nav"}
+  return {"result": res['status'] }
 
