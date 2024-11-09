@@ -15,8 +15,44 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
+import { createClient } from '@/utils/supabase/client';
+import { useEffect, useState } from 'react';
+import { FileObject } from '@supabase/storage-js';
+
 
 export default function Page() {
+  const supabase = createClient();
+  const [userId, setUserId] = useState('');
+  const [videos, setVideos] = useState<FileObject[]>([]);
+  useEffect(() => {
+    const getUserIDAndVideos = async () => {
+      // get user id
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+
+        // get videos
+        const { data, error } = await supabase.storage
+          .from('videos')
+          .list(user.id + '/', {
+            limit: 10,
+            offset: 0,
+            sortBy: { column: 'name', order: 'asc' },
+          });
+
+        if (data) {
+          setVideos(data);
+        } else {
+          console.log('error getting videos');
+        }
+      }
+    };
+
+    getUserIDAndVideos();
+  }, [supabase.auth, supabase.storage]);
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -44,7 +80,7 @@ export default function Page() {
           <Button
             onClick={async () => {
               const config = {
-                function: 'x',
+                function: 'x**2',
               };
               try {
                 const response = await fetch('http://localhost:8000/math', {
@@ -59,14 +95,69 @@ export default function Page() {
                 console.log('math:', data.result);
               } catch (error) {
                 console.log('Sup Error:', error);
+                return;
+              }
+
+              // video was successfully created. time to upload to supabase.
+              try {
+                // pull file from folder
+                const filePath = `/animations/${config.function}.mp4`;
+                const blob = await fetch(filePath).then((res) => res.blob());
+                const file = new Blob([blob], { type: 'video/mp4'});
+
+                const { data, error } = await supabase.storage
+                  .from('videos')
+                  .upload(
+                    `${userId}/${config.function}_${Date.now()}.mp4`,
+                    file
+                  );
+
+                if (error) {
+                  console.log('upload error:', error.message);
+                } else {
+                  console.log('file uploaded successfully:', data);
+                }
+
+                // video was successfully uploaded, now we need to refresh the state
+                const { data: updatedVideos } = await supabase.storage
+                  .from('videos')
+                  .list(userId + '/', {
+                    limit: 10,
+                    offset: 0,
+                    sortBy: {
+                      column: 'name',
+                      order: 'asc',
+                    },
+                  });
+
+                if (updatedVideos) {
+                  setVideos(updatedVideos);
+                }
+              } catch (error) {
+                console.log('File read or upload error:', error);
+                return;
+              }
+              try {
+              } catch {
+                console.log('error getting videos');
               }
             }}
           >
             Test Math Sonify
           </Button>
           <div className='grid auto-rows-min gap-4 md:grid-cols-3'>
-            <div className='aspect-video rounded-xl bg-muted/50' />
-            <div className='aspect-video rounded-xl bg-muted/50' />
+            {videos.map((v, i) => {
+              return (
+                <div key={i}>
+                  {`${process.env.NEXT_PUBLIC_SUPABASE_URL}storage/v1/object/public/videos/${userId}/${v.name}`}
+                  <video
+                    controls
+                    className='w-full h-auto rounded-md'
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}storage/v1/object/public/videos/${userId}/${v.name}`}
+                  />
+                </div>
+              );
+            })}
             <div className='aspect-video rounded-xl bg-muted/50' />
           </div>
           <div className='min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min' />
