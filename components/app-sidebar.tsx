@@ -11,6 +11,7 @@ import {
   Map,
   PieChart,
   Settings2,
+  Sigma,
   SquareTerminal,
 } from 'lucide-react';
 
@@ -54,7 +55,7 @@ const data = {
     {
       title: 'Math',
       url: '/math',
-      icon: Bot,
+      icon: Sigma,
       isActive: true,
       items: [
         {
