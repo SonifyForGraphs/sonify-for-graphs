@@ -45,7 +45,7 @@ export default function Page() {
         if (data) {
           setVideos(data);
         } else {
-          console.log('error getting videos');
+          console.log('error getting videos', error);
         }
       }
     };

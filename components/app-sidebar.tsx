@@ -29,6 +29,7 @@ import {
 // This is sample data.
 const data = {
   navMain: [
+    /*
     {
       title: 'Playground',
       url: '#',
@@ -49,22 +50,16 @@ const data = {
         },
       ],
     },
+    */
     {
-      title: 'Models',
-      url: '#',
+      title: 'Math',
+      url: '/math',
       icon: Bot,
+      isActive: true,
       items: [
         {
-          title: 'Genesis',
-          url: '#',
-        },
-        {
-          title: 'Explorer',
-          url: '#',
-        },
-        {
-          title: 'Quantum',
-          url: '#',
+          title: 'Wave Functions',
+          url: '/math',
         },
       ],
     },
