@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.math_wave_sonification import math_wave_sonify
 from api.utils import MathWaveSonificationConfig
-from api.math_wave_sonification import parse_function, create_animation, create_audio, combine_video_audio
+from api.math_wave_sonification import parse_function, create_animation, create_audio, combine_video_audio, delete_intermediate_files
 
 app = FastAPI()
 origins = [
@@ -36,8 +36,8 @@ async def parse(config: MathWaveSonificationConfig):
   # parse function to make sure it's valid
   try:
     res = await parse_function(config=config)
-  except:
-    print('error parsing function')
+  except Exception as e:
+    print(f'error parsing function: {e}')
     return {'status': 'fail'}
   
   return {'status': 'success'}
@@ -47,8 +47,8 @@ async def animation(config: MathWaveSonificationConfig):
   # create animation
   try:
     res = await create_animation(config=config)
-  except:
-    print('error creating animation')
+  except Exception as e:
+    print(f'error creating animation: {e}')
     return {'status': 'fail'}
   
   return {'status': 'success'}
@@ -58,8 +58,8 @@ async def audio(config: MathWaveSonificationConfig):
   # create audio
   try:
     res = await create_audio(config=config)
-  except:
-    print('error creating audio')
+  except Exception as e:
+    print(f'error creating audio: {e}')
     return {'status': 'fail'}
   
   return {'status': 'success'}
@@ -69,8 +69,19 @@ async def combine(config: MathWaveSonificationConfig):
   # combine animation and audio
   try:
     res = await combine_video_audio(config=config)
-  except:
-    print('error creating video')
+  except Exception as e:
+    print(f'error creating video: {e}')
     return {'status': 'fail'}
   
+  return {'status': 'success'}
+
+@app.post('/math/delete')
+async def delete(config: MathWaveSonificationConfig):
+  # delete all created files
+  try:
+    res = await delete_intermediate_files(config=config)
+  except Exception as e:
+    print(f'error deleting videos: {e}')
+    return {'status': 'fail'}
+
   return {'status': 'success'}

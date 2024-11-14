@@ -7,6 +7,7 @@ from tones import SINE_WAVE
 from tones.mixer import Mixer
 from moviepy.editor import VideoFileClip, AudioFileClip
 from api.utils import MathWaveSonificationConfig
+from pathlib import Path
 
 # step 1. parse function
 async def parse_function(config: MathWaveSonificationConfig):
@@ -110,6 +111,31 @@ async def combine_video_audio(config: MathWaveSonificationConfig):
   video.close()
   audio.close()
   return {'status': 'success'}
+
+# step 5. delete intermediate video, audio, and final video
+# assumes video was uploaded successfully
+# NEED NICK TO UPDATE TONES.WAV WITH WHATEVER FILE SURGE PRODUCES
+async def delete_intermediate_files(config: MathWaveSonificationConfig):
+  animation_file = Path(f'public/animations/animation.mp4')
+  audio_file = Path(f'public/animations/tones.wav')
+  final_video_file = Path(f'public/animations/{config.function}.mp4')
+
+  # put in list to iterate
+  to_delete = [animation_file, audio_file, final_video_file]
+
+  # iterate
+  for file_path in to_delete:
+    try:
+      # check if exists first
+      if file_path.exists():
+        # delete the file
+        file_path.unlink()
+        print(f'deleted: {file_path}')
+      
+      else:
+        print(f'file not found. skipping {file_path}')
+    except Exception as e:
+      print(f'error deleting {file_path}: {e}')
 
 async def math_wave_sonify(config: MathWaveSonificationConfig):
   # parse function and return if invalid

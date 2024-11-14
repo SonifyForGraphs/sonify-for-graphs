@@ -74,7 +74,7 @@ export default function Page() {
       });
       toastIDRef.current = id;
     }
-  }, [status, toast, dismiss]);
+  }, [status, toast]);
 
   // form
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -252,6 +252,22 @@ export default function Page() {
     try {
     } catch {
       console.log('error getting videos');
+    }
+
+    // now that everything is finished, delete the intermediate files
+    try {
+      const response = await fetch('http://localhost:8000/math/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const responseData = await response.json();
+      console.log('deleting files:', responseData.status);
+    } catch {
+      console.log('error did not delete files');
     }
 
     // re-enable submit button
