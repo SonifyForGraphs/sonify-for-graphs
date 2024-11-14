@@ -17,13 +17,20 @@ import { Plus } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { FloatingLabelInput } from '@/components/ui/floating-label-input';
 import { MathBreadcrumb } from '@/components/math/math-breadcrumb';
 import { FormSchema } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import { ToastDescription } from '@/components/math/toast-description';
+import { GraphColorComboBox } from '@/components/math/graph-color-combo-box';
 
 export default function Page() {
   // video stuff
@@ -78,10 +85,21 @@ export default function Page() {
 
   // form
   const form = useForm<z.infer<typeof FormSchema>>({
-    defaultValues: { function: '' },
+    defaultValues: {
+      function: '',
+      title: '',
+      y_label: '',
+      x_label: '',
+      graph_color: 'navy',
+    },
     resolver: zodResolver(FormSchema),
     mode: 'onTouched',
   });
+
+  // callback to handle switching colors in the child component
+  const handleGraphColorSelector = (color: string) => {
+    form.setValue('graph_color', color);
+  };
 
   async function onSubmit(formData: z.infer<typeof FormSchema>) {
     // disable submit button to avoid multiple submissions
@@ -287,7 +305,7 @@ export default function Page() {
         const { data, error } = await supabase.storage
           .from('videos')
           .list(user.id + '/', {
-            limit: 10,
+            limit: 20,
             offset: 0,
             sortBy: { column: 'name', order: 'asc' },
           });
@@ -332,6 +350,7 @@ export default function Page() {
                   onSubmit={form.handleSubmit(onSubmit)}
                   className='w-2/3 space-y-6'
                 >
+                  {/* function field */}
                   <FormField
                     control={form.control}
                     name='function'
@@ -341,6 +360,70 @@ export default function Page() {
                           {...field}
                           id='function'
                           label='function'
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* title field */}
+                  <FormField
+                    control={form.control}
+                    name='title'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FloatingLabelInput
+                          {...field}
+                          id='title'
+                          label='title'
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* y-axis field */}
+                  <FormField
+                    control={form.control}
+                    name='y_label'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FloatingLabelInput
+                          {...field}
+                          id='y_label'
+                          label='y-axis label'
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* x-axis field */}
+                  <FormField
+                    control={form.control}
+                    name='x_label'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FloatingLabelInput
+                          {...field}
+                          id='x_label'
+                          label='x-axis label'
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* graph color */}
+                  <FormField
+                    control={form.control}
+                    name='graph_color'
+                    render={({ field }) => (
+                      <FormItem className='flex flex-col'>
+                        <FormLabel>Graph Color</FormLabel>
+                        <GraphColorComboBox
+                          field={field}
+                          onSelectColor={handleGraphColorSelector}
                         />
                         <FormMessage />
                       </FormItem>

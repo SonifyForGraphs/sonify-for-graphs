@@ -26,7 +26,7 @@ async def create_animation(config: MathWaveSonificationConfig):
  
   # save animation
   fig = plt.figure()
-  fig.suptitle(f'{function}')
+  fig.suptitle(f'{config.title}')
   plt.xlabel(config.x_label)
   plt.ylabel(config.y_label)
   plt.grid()
