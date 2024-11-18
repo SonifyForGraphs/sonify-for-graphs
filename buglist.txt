@@ -1,0 +1,7 @@
+bugs
+1. need to reset status state back to null after sonification finishes, or if it crashes
+    - for both math and stocks pages
+
+
+todos
+1. need to add scrolling to combo box for color selection

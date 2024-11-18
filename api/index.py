@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.math_wave_sonification import math_wave_sonify
-from api.utils import MathWaveSonificationConfig
+from api.utils import MathWaveSonificationConfig, StocksSonificationConfig
 from api.math_wave_sonification import parse_function, create_animation, create_audio, combine_video_audio, delete_intermediate_files
+from api.stocks_sonification import validate_ticker, create_stocks_animation, create_stocks_audio, combine_stocks_video_audio, delete_intermediate_stocks_files
 
 app = FastAPI()
 origins = [
@@ -19,6 +20,7 @@ app.add_middleware(
   allow_headers=['*'],
 )
 
+# MATH STUFF
 @app.post('/math')
 async def math(config: MathWaveSonificationConfig):
   # run video creation
@@ -84,4 +86,61 @@ async def delete(config: MathWaveSonificationConfig):
     print(f'error deleting videos: {e}')
     return {'status': 'fail'}
 
+  return {'status': 'success'}
+
+
+# STOCK STUFF
+@app.post('/stocks/ticker')
+async def ticker(config: StocksSonificationConfig):
+  # make sure ticker is valid
+  try:
+    res = await validate_ticker(config=config)
+  except Exception as e:
+    print(f'error with stock: {e}')
+    return {'status': 'fail'}
+
+  return {'status': 'success'}
+
+@app.post('/stocks/animation')
+async def stocks_animation(config: StocksSonificationConfig):
+  # create animation
+  try:
+    res = await create_stocks_animation(config=config)
+  except Exception as e:
+    print(f'error creating animation: {e}')
+    return {'status': 'fail'}
+  
+  return {'status': 'success'}
+
+@app.post('/stocks/audio')
+async def stocks_audio(config: StocksSonificationConfig):
+  # create audio
+  try:
+    res = await create_stocks_audio(config=config)
+  except Exception as e:
+    print(f'error creating audio: {e}')
+    return {'status': 'fail'}
+  
+  return {'status': 'success'}
+
+@app.post('/stocks/combine')
+async def stocks_combine(config: StocksSonificationConfig):
+  # combine animation and audio
+  try:
+    res = await combine_stocks_video_audio(config=config)
+  except Exception as e:
+    print(f'error creating video: {e}')
+    return {'status': 'fail'}
+  
+  return {'status': 'success'}
+
+@app.post('/stocks/delete')
+async def delete(config: StocksSonificationConfig):
+  # delete all created files
+  try:
+    res = await delete_intermediate_stocks_files(config=config)
+  except Exception as e:
+    print(f'error deleting files: {e}')
+    return {'status': 'fail'}
+  
   return {'status': 'success'}

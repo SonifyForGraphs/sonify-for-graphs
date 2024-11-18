@@ -26,11 +26,11 @@ import {
 } from '@/components/ui/form';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { FloatingLabelInput } from '@/components/ui/floating-label-input';
-import { MathBreadcrumb } from '@/components/math/math-breadcrumb';
+import { StocksBreadCrumb } from '@/components/stocks/stocks-breadcrumb';
 import { FormSchema } from './actions';
 import { useToast } from '@/hooks/use-toast';
-import { ToastDescription } from '@/components/math/toast-description';
-import { GraphColorComboBox } from '@/components/math/graph-color-combo-box';
+import { ToastDescription } from '@/components/stocks/toast-description-stocks';
+import { GraphColorComboBox } from '@/components/stocks/graph-color-combo-box-stocks';
 
 export default function Page() {
   // video stuff
@@ -47,13 +47,13 @@ export default function Page() {
   // progress/status state variables
   // valid function, create animation, create audio, merge and save video/audio, upload to supabase
   const [status, setStatus] = useState<{
-    validFunction: boolean | null;
+    validTicker: boolean | null;
     animationCreated: boolean | null;
     audioCreated: boolean | null;
     videoCreated: boolean | null;
     uploadedToSupabase: boolean | null;
   }>({
-    validFunction: null,
+    validTicker: null,
     animationCreated: null,
     audioCreated: null,
     videoCreated: null,
@@ -86,7 +86,7 @@ export default function Page() {
   // form
   const form = useForm<z.infer<typeof FormSchema>>({
     defaultValues: {
-      function: '',
+      ticker: '',
       title: '',
       y_label: '',
       x_label: '',
@@ -112,9 +112,9 @@ export default function Page() {
       description: <ToastDescription {...status} />,
     });
 
-    // parse function to make sure it's valid
+    // make sure ticker is valid
     try {
-      const response = await fetch('http://localhost:8000/math/parse', {
+      const response = await fetch('http://localhost:8000/stocks/ticker', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -123,12 +123,12 @@ export default function Page() {
       });
 
       const responseData = await response.json();
-      console.log('parsing function:', responseData.status);
+      console.log('parsing ticker:', responseData.status);
       if (responseData.status === 'fail') {
-        // invalid function, set all statuses to false
+        // invalid ticker, set all statuses to false
         setStatus((prev) => ({
           ...prev,
-          validFunction: false,
+          validTicker: false,
           animationCreated: false,
           audioCreated: false,
           videoCreated: false,
@@ -139,12 +139,12 @@ export default function Page() {
     } catch (error) {
       console.log('Sup Error:', error);
     }
-    // valid function
-    setStatus((prev) => ({ ...prev, validFunction: true }));
+    // valid ticker
+    setStatus((prev) => ({ ...prev, validTicker: true }));
 
     // now create animation
     try {
-      const response = await fetch('http://localhost:8000/math/animation', {
+      const response = await fetch('http://localhost:8000/stocks/animation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -174,7 +174,7 @@ export default function Page() {
 
     // now create audio
     try {
-      const response = await fetch('http://localhost:8000/math/audio', {
+      const response = await fetch('http://localhost:8000/stocks/audio', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -203,7 +203,7 @@ export default function Page() {
 
     // now combine animation and audio
     try {
-      const response = await fetch('http://localhost:8000/math/combine', {
+      const response = await fetch('http://localhost:8000/stocks/combine', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -232,13 +232,13 @@ export default function Page() {
     // video was successfully created. time to upload to supabase.
     try {
       // pull file from folder
-      const filePath = `/animations/${formData.function}.mp4`;
+      const filePath = `/animations/${formData.ticker}.mp4`;
       const blob = await fetch(filePath).then((res) => res.blob());
       const file = new Blob([blob], { type: 'video/mp4' });
 
       const { data, error } = await supabase.storage
         .from('videos')
-        .upload(`${userId}/math/${formData.function}_${Date.now()}.mp4`, file);
+        .upload(`${userId}/stocks/${formData.ticker}_${Date.now()}.mp4`, file);
 
       if (error) {
         console.log('upload error:', error.message);
@@ -251,7 +251,7 @@ export default function Page() {
       // video was successfully uploaded, now we need to refresh the state
       const { data: updatedVideos } = await supabase.storage
         .from('videos')
-        .list(userId + '/math/', {
+        .list(userId + '/stocks/', {
           limit: 10,
           offset: 0,
           sortBy: {
@@ -274,7 +274,7 @@ export default function Page() {
 
     // now that everything is finished, delete the intermediate files
     try {
-      const response = await fetch('http://localhost:8000/math/delete', {
+      const response = await fetch('http://localhost:8000/stocks/delete', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -304,7 +304,7 @@ export default function Page() {
         // get videos
         const { data, error } = await supabase.storage
           .from('videos')
-          .list(user.id + '/math/', {
+          .list(user.id + '/stocks/', {
             limit: 20,
             offset: 0,
             sortBy: { column: 'name', order: 'asc' },
@@ -325,7 +325,7 @@ export default function Page() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <MathBreadcrumb />
+        <StocksBreadCrumb />
         <div className='flex flex-1 flex-col gap-4 p-4 pt-0'></div>
         {/*<FloatingActionButton openFAB={openFAB} setOpenFAB={setOpenFAB} form={form} />*/}
         <Dialog open={openFAB} onOpenChange={setOpenFAB}>
@@ -350,16 +350,16 @@ export default function Page() {
                   onSubmit={form.handleSubmit(onSubmit)}
                   className='w-2/3 space-y-6'
                 >
-                  {/* function field */}
+                  {/* stock ticker */}
                   <FormField
                     control={form.control}
-                    name='function'
+                    name='ticker'
                     render={({ field }) => (
                       <FormItem>
                         <FloatingLabelInput
                           {...field}
-                          id='function'
-                          label='function'
+                          id='ticker'
+                          label='ticker'
                         />
                         <FormMessage />
                       </FormItem>
@@ -446,7 +446,7 @@ export default function Page() {
                   <video
                     controls
                     className='w-full h-auto rounded-md'
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}storage/v1/object/public/videos/${userId}/math/${v.name}`}
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}storage/v1/object/public/videos/${userId}/stocks/${v.name}`}
                   />
                 </div>
               );
@@ -457,94 +457,3 @@ export default function Page() {
     </SidebarProvider>
   );
 }
-
-// code that worked originally. trying to refactor now.
-/*
- {/*
-          <Button
-            onClick={async () => {
-              try {
-                const response = await fetch('http://localhost:8000/math', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify(config),
-                });
-
-                const data = await response.json();
-                console.log('math:', data.result);
-              } catch (error) {
-                console.log('Sup Error:', error);
-                return;
-              }
-
-              // video was successfully created. time to upload to supabase.
-              try {
-                // pull file from folder
-                const filePath = `/animations/${config.function}.mp4`;
-                const blob = await fetch(filePath).then((res) => res.blob());
-                const file = new Blob([blob], { type: 'video/mp4' });
-
-                const { data, error } = await supabase.storage
-                  .from('videos')
-                  .upload(
-                    `${userId}/${config.function}_${Date.now()}.mp4`,
-                    file
-                  );
-
-                if (error) {
-                  console.log('upload error:', error.message);
-                } else {
-                  console.log('file uploaded successfully:', data);
-                }
-
-                // video was successfully uploaded, now we need to refresh the state
-                const { data: updatedVideos } = await supabase.storage
-                  .from('videos')
-                  .list(userId + '/', {
-                    limit: 10,
-                    offset: 0,
-                    sortBy: {
-                      column: 'name',
-                      order: 'asc',
-                    },
-                  });
-
-                if (updatedVideos) {
-                  setVideos(updatedVideos);
-                }
-              } catch (error) {
-                console.log('File read or upload error:', error);
-                return;
-              }
-              try {
-              } catch {
-                console.log('error getting videos');
-              }
-            }}
-          >
-            Test Math Sonify
-          </Button>
-          <div className='grid auto-rows-min gap-4 md:grid-cols-3'>
-            {videos.map((v, i) => {
-              return (
-                <div key={i}>
-                  <video
-                    controls
-                    className='w-full h-auto rounded-md'
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}storage/v1/object/public/videos/${userId}/${v.name}`}
-                  />
-                </div>
-              );
-            })}
-          </div>
-          <div className='min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min' />
-          }
-
-
-
-
-
-
-*/

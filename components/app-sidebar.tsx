@@ -5,6 +5,7 @@ import {
   AudioWaveform,
   BookOpen,
   Bot,
+  ChartLine,
   Command,
   Frame,
   GalleryVerticalEnd,
@@ -61,6 +62,18 @@ const data = {
         {
           title: 'Wave Functions',
           url: '/math',
+        },
+      ],
+    },
+    {
+      title: 'Stocks',
+      url: '/stocks',
+      icon: ChartLine,
+      isActive: true,
+      items: [
+        {
+          title: 'Stocks',
+          url: '/stocks',
         },
       ],
     },

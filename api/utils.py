@@ -27,3 +27,24 @@ class MathWaveSonificationConfig(BaseModel):
 
   # audio
   # will add in once everything else is working. right now just default will suffice.
+
+
+
+class StocksSonificationConfig(BaseModel):
+  # ticker
+  ticker: str = 'SPY'
+
+  # general (here and below I just copied above so whenever changes are made there, reflect them here)
+  num_days: Optional[int] = 400 # needs to be yfinance compatible. so may not just be int, might need string too.
+  
+  # related to plotting
+  x_label: Optional[str] = "Time"
+  y_label: Optional[str] = "Price"
+  title: Optional[str] = "Price vs Time"
+  graph_color: Optional[str] = 'navy' # make sure color is in matplotlib library
+
+  # animation
+  fps: Optional[int] = 30 # make sure greater than 0
+
+  # audio
+  # will add in once everything else is working. right now just default will suffice.

@@ -81,7 +81,7 @@ export const GraphColorComboBox = ({
 }: {
   field: ControllerRenderProps<
     {
-      function: string;
+      ticker: string;
       title: string;
       y_label: string;
       x_label: string;
