@@ -63,9 +63,16 @@ export default function Page() {
   // toast stuff
   const { toast, dismiss } = useToast();
   const toastIDRef = useRef<string | null>(null);
+  const dismissRef = useRef(dismiss);
+
+  useEffect(() => {
+    dismissRef.current = dismiss;
+  }, [dismiss]);
+
   useEffect(() => {
     if (toastIDRef.current) {
-      dismiss(toastIDRef.current);
+      //dismiss(toastIDRef.current);
+      dismissRef.current(toastIDRef.current);
       const { id } = toast({
         title: 'Sonification Progress',
         duration: 100000,

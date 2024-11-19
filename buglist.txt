@@ -1,6 +1,7 @@
 bugs
 1. need to reset status state back to null after sonification finishes, or if it crashes
     - for both math and stocks pages
+2. functions like cot(x) don't work because divide by 0
 
 
 todos
