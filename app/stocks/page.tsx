@@ -31,6 +31,7 @@ import { FormSchema } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import { ToastDescription } from '@/components/stocks/toast-description-stocks';
 import { GraphColorComboBox } from '@/components/stocks/graph-color-combo-box-stocks';
+import { Card } from '@/components/ui/card';
 
 export default function Page() {
   // video stuff
@@ -449,13 +450,13 @@ export default function Page() {
             .filter((v) => v.name.endsWith('.mp4'))
             .map((v, i) => {
               return (
-                <div key={i}>
+                <Card key={i}>
                   <video
                     controls
                     className='w-full h-auto rounded-md'
                     src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}storage/v1/object/public/videos/${userId}/stocks/${v.name}`}
                   />
-                </div>
+                </Card>
               );
             })}
         </div>

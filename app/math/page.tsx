@@ -31,6 +31,7 @@ import { FormSchema } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import { ToastDescription } from '@/components/math/toast-description';
 import { GraphColorComboBox } from '@/components/math/graph-color-combo-box';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function Page() {
   // video stuff
@@ -180,7 +181,7 @@ export default function Page() {
 
     // now create audio
     try {
-      const response = await fetch('http://localhost:8000/math/audio', {
+      const response = await fetch('http://localhost:8000/math/surgeaudio', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -443,18 +444,20 @@ export default function Page() {
             </div>
           </DialogContent>
         </Dialog>
-        <div className='grid auto-rows-min gap-4 md:grid-cols-3'>
+        <div className='grid auto-rows-min gap-4 md:grid-cols-3 p-8'>
           {videos
             .filter((v) => v.name.endsWith('.mp4'))
             .map((v, i) => {
               return (
-                <div key={i}>
-                  <video
-                    controls
-                    className='w-full h-auto rounded-md'
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}storage/v1/object/public/videos/${userId}/math/${v.name}`}
-                  />
-                </div>
+                <Card key={i} className='shadow-lg'>
+                  <CardContent>
+                    <video
+                      controls
+                      className='w-full h-auto rounded-md'
+                      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}storage/v1/object/public/videos/${userId}/math/${v.name}`}
+                    />
+                  </CardContent>
+                </Card>
               );
             })}
         </div>

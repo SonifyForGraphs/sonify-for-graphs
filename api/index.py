@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.math_wave_sonification import math_wave_sonify
 from api.utils import MathWaveSonificationConfig, StocksSonificationConfig
-from api.math_wave_sonification import parse_function, create_animation, create_audio, combine_video_audio, delete_intermediate_files
+from api.math_wave_sonification import parse_function, create_animation, create_audio, combine_video_audio, delete_intermediate_files, create_surge_audio
 from api.stocks_sonification import validate_ticker, create_stocks_animation, create_stocks_audio, combine_stocks_video_audio, delete_intermediate_stocks_files
 
 app = FastAPI()
@@ -86,6 +86,17 @@ async def delete(config: MathWaveSonificationConfig):
     print(f'error deleting videos: {e}')
     return {'status': 'fail'}
 
+  return {'status': 'success'}
+
+@app.post('/math/surgeaudio')
+async def surge_audio(config: MathWaveSonificationConfig):
+  # create audio
+  try:
+    res = await create_surge_audio(config=config)
+  except Exception as e:
+    print(f'error creating audio: {e}')
+    return {'status': 'fail'}
+  
   return {'status': 'success'}
 
 
