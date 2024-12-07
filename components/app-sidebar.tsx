@@ -102,12 +102,12 @@ const data = {
     },
     {
       title: 'Settings',
-      url: '#',
+      url: 'Settings',
       icon: Settings2,
       items: [
         {
           title: 'General',
-          url: 'settings',
+          url: 'Settings',
         },
         {
           title: 'Team',
