@@ -11,7 +11,7 @@ export default async function Home() {
 
   // user is already logged in. redirect to the dashboard
   if (user) {
-    return redirect('/dashboard');
+    return redirect('/math');
   }
   return (
     <main className='flex flex-col min-h-screen'>

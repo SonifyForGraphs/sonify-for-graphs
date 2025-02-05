@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Plus } from 'lucide-react';
+import { Plus, Trash } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -31,9 +31,13 @@ import { FormSchema } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import { ToastDescription } from '@/components/math/toast-description';
 import { GraphColorComboBox } from '@/components/math/graph-color-combo-box';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
 
 export default function Page() {
+  // router to reload the page
+  const router = useRouter();
+
   // video stuff
   const supabase = createClient();
   const [userId, setUserId] = useState('');
@@ -297,6 +301,21 @@ export default function Page() {
 
     // re-enable submit button
     setSubmitButtonDisabled(false);
+
+    // dismiss toast
+    dismiss();
+    // reset status variables
+    setStatus((prev) => {
+      return {
+        ...prev,
+
+        validFunction: null,
+        animationCreated: null,
+        audioCreated: null,
+        videoCreated: null,
+        uploadedToSupabase: null,
+      };
+    });
   }
 
   useEffect(() => {
@@ -333,135 +352,158 @@ export default function Page() {
       <AppSidebar />
       <SidebarInset>
         <MathBreadcrumb />
-        <div className='flex flex-1 flex-col gap-4 p-4 pt-0'></div>
-        {/*<FloatingActionButton openFAB={openFAB} setOpenFAB={setOpenFAB} form={form} />*/}
-        <Dialog open={openFAB} onOpenChange={setOpenFAB}>
-          <DialogTrigger asChild>
-            <Button
-              className='fixed w-16 h-16 bottom-16 right-16 p-4 rounded-full shadow-lg bg-sky-900 text-white hover:bg-sky-600'
-              aria-label='open dialog'
-            >
-              <Plus color='#ffffff' />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Enter Configuration Details</DialogTitle>
-              <DialogDescription>
-                Customize and create your sonfication!
-              </DialogDescription>
-            </DialogHeader>
-            <div className='space-y-4 py-4'>
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className='w-2/3 space-y-6'
-                >
-                  {/* function field */}
-                  <FormField
-                    control={form.control}
-                    name='function'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FloatingLabelInput
-                          {...field}
-                          id='function'
-                          label='function'
-                        />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* title field */}
-                  <FormField
-                    control={form.control}
-                    name='title'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FloatingLabelInput
-                          {...field}
-                          id='title'
-                          label='title'
-                        />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* y-axis field */}
-                  <FormField
-                    control={form.control}
-                    name='y_label'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FloatingLabelInput
-                          {...field}
-                          id='y_label'
-                          label='y-axis label'
-                        />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* x-axis field */}
-                  <FormField
-                    control={form.control}
-                    name='x_label'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FloatingLabelInput
-                          {...field}
-                          id='x_label'
-                          label='x-axis label'
-                        />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* graph color */}
-                  <FormField
-                    control={form.control}
-                    name='graph_color'
-                    render={({ field }) => (
-                      <FormItem className='flex flex-col'>
-                        <FormLabel>Graph Color</FormLabel>
-                        <GraphColorComboBox
-                          field={field}
-                          onSelectColor={handleGraphColorSelector}
-                        />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <LoadingButton disabled={submitButtonDisabled} type='submit'>
-                    Sonify!
-                  </LoadingButton>
-                </form>
-              </Form>
-            </div>
-          </DialogContent>
-        </Dialog>
-        <div className='grid auto-rows-min gap-4 md:grid-cols-3 p-8'>
-          {videos
-            .filter((v) => v.name.endsWith('.mp4'))
-            .map((v, i) => {
-              return (
-                <Card key={i} className='shadow-lg'>
-                  <CardContent>
-                    <video
-                      controls
-                      className='w-full h-auto rounded-md'
-                      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}storage/v1/object/public/videos/${userId}/math/${v.name}`}
+        <div className='flex flex-1 flex-col gap-4 p-4 pt-0'>
+          {/*<FloatingActionButton openFAB={openFAB} setOpenFAB={setOpenFAB} form={form} />*/}
+          <Dialog open={openFAB} onOpenChange={setOpenFAB}>
+            <DialogTrigger asChild>
+              <Button
+                className='fixed w-16 h-16 bottom-16 right-16 p-4 rounded-full shadow-lg bg-sky-900 text-white hover:bg-sky-600'
+                aria-label='open dialog'
+              >
+                <Plus color='#ffffff' />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Enter Configuration Details</DialogTitle>
+                <DialogDescription>
+                  Customize and create your sonfication!
+                </DialogDescription>
+              </DialogHeader>
+              <div className='space-y-4 py-4'>
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className='w-2/3 space-y-6'
+                  >
+                    {/* function field */}
+                    <FormField
+                      control={form.control}
+                      name='function'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FloatingLabelInput
+                            {...field}
+                            id='function'
+                            label='function'
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </CardContent>
-                </Card>
-              );
-            })}
+
+                    {/* title field */}
+                    <FormField
+                      control={form.control}
+                      name='title'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FloatingLabelInput
+                            {...field}
+                            id='title'
+                            label='title'
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* y-axis field */}
+                    <FormField
+                      control={form.control}
+                      name='y_label'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FloatingLabelInput
+                            {...field}
+                            id='y_label'
+                            label='y-axis label'
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* x-axis field */}
+                    <FormField
+                      control={form.control}
+                      name='x_label'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FloatingLabelInput
+                            {...field}
+                            id='x_label'
+                            label='x-axis label'
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* graph color */}
+                    <FormField
+                      control={form.control}
+                      name='graph_color'
+                      render={({ field }) => (
+                        <FormItem className='flex flex-col'>
+                          <FormLabel>Graph Color</FormLabel>
+                          <GraphColorComboBox
+                            field={field}
+                            onSelectColor={handleGraphColorSelector}
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <LoadingButton
+                      disabled={submitButtonDisabled}
+                      type='submit'
+                    >
+                      Sonify!
+                    </LoadingButton>
+                  </form>
+                </Form>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <div className='grid auto-rows-min gap-4 md:grid-cols-3 p-8'>
+            {videos
+              .filter((v) => v.name.endsWith('.mp4'))
+              .map((v, i) => {
+                return (
+                  <Card key={i} className='shadow-md'>
+                    <CardContent className=''>
+                      <video
+                        controls
+                        className='w-full h-auto rounded-md'
+                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}storage/v1/object/public/videos/${userId}/math/${v.name}`}
+                      />
+                      <CardFooter className='justify-end'>
+                        <Button
+                          className='mt-4 mb-[calc(-24px)] w-24'
+                          onClick={async () => {
+                            const { data, error } = await supabase.storage
+                              .from('videos')
+                              .remove([`${userId}/math/${v.name}`]);
+                            if (error) {
+                              console.log(error);
+                            }
+                            
+                          }}
+                        >
+                          <div className='flex flex-row justify-center items-center text-center'>
+                            <Trash color='red' strokeWidth={3} />
+                            <span className='ml-2'>Delete</span>
+                          </div>
+                        </Button>
+                      </CardFooter>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+          </div>
+          <div className='m-40 h-200 w-200 bg-red-400'></div>
         </div>
-        <div className='m-40 h-200 w-200'></div>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -1,13 +1,10 @@
 bugs
-1. need to reset status state back to null after sonification finishes, or if it crashes
-    - for both math and stocks pages
+1. toast pops up randomly
 2. functions like cot(x) don't work because divide by 0
 3. test all colors. for example, slate doesn't work.
 
 
 todos
-1. need to add scrolling to combo box for color selection
-2. add delete functionality to delete video from video list
 3. fill out documentation and settings pages
-4. add option for data points
-5. delete all files if video creation fails midway
+6. add upward translation interactive sonification
+7. add bfs interactive sonification
