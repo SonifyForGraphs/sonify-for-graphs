@@ -9,6 +9,7 @@ import {
   Command,
   Frame,
   GalleryVerticalEnd,
+  Image,
   Map,
   PieChart,
   Settings2,
@@ -78,6 +79,22 @@ const data = {
       ],
     },
     {
+      title: 'Image',
+      url: '/image',
+      icon: Image,
+      isActive: true,
+      items: [
+        {
+          title: 'Interactive',
+          url: '/interactive',
+        },
+        {
+          title: 'Wave Translation',
+          url: '/translation',
+        },
+      ],
+    },
+    {
       title: 'Documentation',
       url: '#',
       icon: BookOpen,
@@ -102,12 +119,12 @@ const data = {
     },
     {
       title: 'Settings',
-      url: 'Settings',
+      url: '/settings',
       icon: Settings2,
       items: [
         {
           title: 'General',
-          url: 'Settings',
+          url: '/settings',
         },
         {
           title: 'Team',
@@ -120,23 +137,6 @@ const data = {
       ],
     },
   ],
-  projects: [
-    {
-      name: 'Design Engineering',
-      url: '#',
-      icon: Frame,
-    },
-    {
-      name: 'Sales & Marketing',
-      url: '#',
-      icon: PieChart,
-    },
-    {
-      name: 'Travel',
-      url: '#',
-      icon: Map,
-    },
-  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -147,7 +147,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        {/*<NavProjects projects={data.projects} />*/}
       </SidebarContent>
       <SidebarFooter>
         <NavUser />
