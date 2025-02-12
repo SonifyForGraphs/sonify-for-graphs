@@ -47,7 +47,7 @@ export default async function Home() {
             and experience data like never before.
           </p>
           <Link
-            href='/dashboard'
+            href='/math'
             className='px-8 py-3 bg-blue-600 text-white text-lg rounded shadow hover:bg-blue-700'
           >
             Get Started

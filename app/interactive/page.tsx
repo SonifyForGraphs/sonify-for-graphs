@@ -320,6 +320,8 @@ export default function Interactive() {
                 ref={canvasRef}
                 onClick={handleCanvasClick}
                 className='border rounded-md shadow-sm max-h-[calc(700px)]'
+                aria-label='Image canvas where users can click to generate sonification waves that begin from the clicked point'
+                role='img'
               />
               <input
                 type='file'
@@ -327,9 +329,10 @@ export default function Interactive() {
                 onChange={handleFileChange}
                 ref={fileInputRef}
                 className='hidden'
+                aria-labelledby='upload-button'
               />
 
-              <Button onClick={() => fileInputRef.current?.click()}>
+              <Button onClick={() => fileInputRef.current?.click()} id='upload-button' aria-label='Upload an image'>
                 Upload Image
               </Button>
 
@@ -348,6 +351,7 @@ export default function Interactive() {
                       );
                     }
                   }}
+                  aria-label='Clear the uploaded image.'
                 >
                   Clear Image
                 </Button>

@@ -356,13 +356,16 @@ export default function Page() {
               <Button
                 className='fixed w-16 h-16 bottom-16 right-16 p-4 rounded-full shadow-lg bg-sky-900 text-white hover:bg-sky-600'
                 aria-label='open dialog'
+                aria-expanded={openFAB}
               >
                 <Plus color='#ffffff' />
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent aria-labelledby='dialog-title'>
               <DialogHeader>
-                <DialogTitle>Enter Configuration Details</DialogTitle>
+                <DialogTitle id='dialog-title'>
+                  Enter Configuration Details
+                </DialogTitle>
                 <DialogDescription>
                   Customize and create your sonfication!
                 </DialogDescription>
@@ -383,6 +386,7 @@ export default function Page() {
                             {...field}
                             id='ticker'
                             label='ticker'
+                            aria-label='Enter a stock ticker'
                           />
                           <FormMessage />
                         </FormItem>
@@ -399,6 +403,7 @@ export default function Page() {
                             {...field}
                             id='title'
                             label='title'
+                            aria-label='Enter a title'
                           />
                           <FormMessage />
                         </FormItem>
@@ -415,6 +420,7 @@ export default function Page() {
                             {...field}
                             id='y_label'
                             label='y-axis label'
+                            aria-label='Enter a y-axis label'
                           />
                           <FormMessage />
                         </FormItem>
@@ -431,6 +437,7 @@ export default function Page() {
                             {...field}
                             id='x_label'
                             label='x-axis label'
+                            aria-label='Enter a x-axis label'
                           />
                           <FormMessage />
                         </FormItem>
@@ -447,6 +454,7 @@ export default function Page() {
                           <GraphColorComboBox
                             field={field}
                             onSelectColor={handleGraphColorSelector}
+                            aria-label='Select a graph color'
                           />
                           <FormMessage />
                         </FormItem>
@@ -455,6 +463,7 @@ export default function Page() {
                     <LoadingButton
                       disabled={submitButtonDisabled}
                       type='submit'
+                      aria-label='Submit configuration details and begin sonifying'
                     >
                       Sonify!
                     </LoadingButton>
@@ -474,27 +483,30 @@ export default function Page() {
                         controls
                         className='w-full h-auto rounded-md'
                         src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}storage/v1/object/public/videos/${userId}/stocks/${v.name}`}
+                        aria-label={`Video ${i + 1}: ${v.name}`}
                       />
                       <CardFooter className='justify-end'>
-                      <Button
-                        className='mt-4 mb-[calc(-24px)] w-24'
-                        onClick={async () => {
-                          const { data, error } = await supabase.storage
-                            .from('videos')
-                            .remove([`${userId}/stocks/${v.name}`]);
-                          if (error) {
-                            console.log(error);
-                          }
-                        }}
-                      >
-                        <div className='flex flex-row justify-center items-center text-center'>
-                          <Trash color='red' strokeWidth={3} />
-                          <span className='ml-2'>Delete</span>
-                        </div>
-                      </Button>
-                    </CardFooter>
+                        <Button
+                          className='mt-4 mb-[calc(-24px)] w-24'
+                          onClick={async () => {
+                            const { data, error } = await supabase.storage
+                              .from('videos')
+                              .remove([`${userId}/stocks/${v.name}`]);
+                            if (error) {
+                              console.log(error);
+                            }
+                          }}
+                          aria-label={`Delete video ${i + 1} with name ${
+                            v.name
+                          }`}
+                        >
+                          <div className='flex flex-row justify-center items-center text-center'>
+                            <Trash color='red' strokeWidth={3} />
+                            <span className='ml-2'>Delete</span>
+                          </div>
+                        </Button>
+                      </CardFooter>
                     </CardContent>
-                    
                   </Card>
                 );
               })}
