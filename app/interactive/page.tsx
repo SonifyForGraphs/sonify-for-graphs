@@ -78,6 +78,8 @@ export default function Interactive() {
       const maxHeight = 600;
       const aspectRatio = img.width / img.height;
       console.log(img.width, img.height, aspectRatio);
+      // doesn't work. right now I just set max height to be like 700 in the canvas element
+      // works but it warps the aspect ratio so everything looks a little off
       if (img.width > maxWidth) {
         canvas.width = maxWidth;
         canvas.height = Math.round(canvas.width / aspectRatio);

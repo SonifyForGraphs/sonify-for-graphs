@@ -32,12 +32,8 @@ import { useToast } from '@/hooks/use-toast';
 import { ToastDescription } from '@/components/math/toast-description';
 import { GraphColorComboBox } from '@/components/math/graph-color-combo-box';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { useRouter } from 'next/navigation';
 
 export default function Page() {
-  // router to reload the page
-  const router = useRouter();
-
   // video stuff
   const supabase = createClient();
   const [userId, setUserId] = useState('');

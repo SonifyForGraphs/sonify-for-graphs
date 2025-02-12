@@ -88,21 +88,23 @@ const data = {
           title: 'Interactive',
           url: '/interactive',
         },
+        /*
         {
           title: 'Wave Translation',
           url: '/translation',
-        },
+        },*/
       ],
     },
     {
       title: 'Documentation',
-      url: '#',
+      url: '/documentation',
       icon: BookOpen,
       items: [
         {
-          title: 'Introduction',
-          url: '#',
+          title: 'Tutorial',
+          url: '/documentation',
         },
+        /*
         {
           title: 'Get Started',
           url: '#',
@@ -114,26 +116,7 @@ const data = {
         {
           title: 'Changelog',
           url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Settings',
-      url: '/settings',
-      icon: Settings2,
-      items: [
-        {
-          title: 'General',
-          url: '/settings',
-        },
-        {
-          title: 'Team',
-          url: '#',
-        },
-        {
-          title: 'Limits',
-          url: '#',
-        },
+        },*/
       ],
     },
   ],

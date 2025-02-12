@@ -1,9 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from api.math_wave_sonification import math_wave_sonify
 from api.utils import MathWaveSonificationConfig, StocksSonificationConfig
 from api.math_wave_sonification import parse_function, create_animation, create_audio, combine_video_audio, delete_intermediate_files, create_surge_audio
 from api.stocks_sonification import validate_ticker, create_stocks_animation, create_stocks_audio, combine_stocks_video_audio, delete_intermediate_stocks_files
+from api.translation_sonification import create_translation, delete_intermediate_translation_files
 
 app = FastAPI()
 origins = [
@@ -150,6 +151,30 @@ async def delete(config: StocksSonificationConfig):
   # delete all created files
   try:
     res = await delete_intermediate_stocks_files(config=config)
+  except Exception as e:
+    print(f'error deleting files: {e}')
+    return {'status': 'fail'}
+  
+  return {'status': 'success'}
+
+
+# translation wave
+@app.post('/image/translation')
+async def translation(file: UploadFile = File(...)):
+  # doing everything at once cuz lazy
+  try:
+    res = await create_translation(file=file)
+  except Exception as e:
+    print(f'error creating translation sonification: {e}')
+    return {'status': 'fail'}
+
+  return {'status': 'success'}
+
+@app.post('/image/delete')
+async def delete_translation():
+  # delete all created files
+  try:
+    res = await delete_intermediate_translation_files()
   except Exception as e:
     print(f'error deleting files: {e}')
     return {'status': 'fail'}

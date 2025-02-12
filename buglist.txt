@@ -7,4 +7,3 @@ bugs
 todos
 3. fill out documentation and settings pages
 6. add upward translation interactive sonification
-7. add bfs interactive sonification
