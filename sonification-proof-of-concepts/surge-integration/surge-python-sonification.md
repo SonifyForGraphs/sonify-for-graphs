@@ -10,13 +10,11 @@ For an extensive tutorial on how to use the Surge Synthesizer broadly, please se
 A "Block" is a discrete unit of synth control, measured in individual samples:
 
 1. **Block Size Calculation**:
-   - Block Size = Samples ÷ Block
-   - Number of Blocks per Frame = (Sample Rate ÷ FPS) ÷ Block Size
+   - $\text{Block Size} =\frac{\text{Samples}}{\text{Block}}$
+
 
 2. **Blocks per Frame Equation**:
-   ```
-   Blocks per Frame = (Sample Rate / FPS) / Block Size
-   ```
+   - $\text{Number of Blocks per Frame} = \frac{\frac{\text{Sample Rate}}{\text{FPS}}}{\text{Block Size}}$
 
 ## Prerequisites
 - Python libraries:
