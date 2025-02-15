@@ -1,4 +1,4 @@
-# soundviz
+# Soundviz
 
 -- Developer Setup Guide
 
