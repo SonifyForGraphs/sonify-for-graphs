@@ -9,6 +9,7 @@ import surgepy
 import wave
 
 def main():
+#Generate mathematical function data (to be passed by user in final product):
     function = "y = 2 * (x - floor(x)) - 1"
     x = np.linspace(0, 25 * np.pi, 400) /5 #uncomment /5 for saw, too fast otherwise
     y = 2 * (x - np.floor(x)) - 1
@@ -16,13 +17,15 @@ def main():
     #y = np.sin(x)
     #function = "y = x * sin(x)"
     #y = x * np.sin(x)
+
+#Create animated plot:
     fig = plt.figure()
     fig.suptitle(f'{function}')
     plt.xlabel('x [rad]')
     plt.ylabel('y')
     plt.grid()
     plt.ylim((min(y) - 1, max(y) + 1))
-    
+
     def animate(n):
         line, = plt.plot(x[:n], y[:n], color = 'navy')
         return line,
@@ -36,10 +39,12 @@ def main():
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=fps, metadata=dict(artist='Me'), bitrate=18000)
     ani.save('animation.mp4', writer=writer)
+
+#Initialize surge synthesizer
     surge = surgepy.createSurge(sample_rate) #create surge synthesizer with scene frequency=44100 Hz
     
-    #Following section created with the help of the example here:https://github.com/surge-synthesizer/surge/blob/main/scripts/ipy/Demonstrate%20Surge%20in%20Python.ipynb
-    
+#Following section created with the help of the example here: https://github.com/surge-synthesizer/surge/blob/main/scripts/ipy/Demonstrate%20Surge%20in%20Python.ipynb
+#Grab Surge Oscillator controls
     cg_OSC = surge.getControlGroup(srgco.cg_OSC) #query for oscillator control group constants
     osc0 = cg_OSC.getEntries()[0]       #get first oscillator
     osc0_parameters = osc0.getParams()  #get oscillator parameters
@@ -49,18 +54,20 @@ def main():
     
     mod_wheel = surge.getModSource(srgco.ms_modwheel) #grab mod wheel
     surge.setModDepth01(osc0_pitch, mod_wheel, 1)      #attach mod wheel to pitch with full range (1)
-    
+
+#normalize function values
     min_value = min(y)
     max_value = max(y)
     value_range = max_value - min_value
     normalized_values = [(v - min_value) / value_range for v in y]  #normalize to 0-1 scale
     
-    #see surge starter file in repository for derivation
-    blocks_per_frame = sample_rate // fps // surge.getBlockSize() 
-    total_samples = int(video_time * sample_rate)
+    #see surge-python-sonfification.md for derivation
+    blocks_per_frame = int(sample_rate // fps // surge.getBlockSize()) 
+    total_samples = int(np.ceil(video_time * sample_rate))
     #create output array of size = [# of blocks][size of block]
     audio_data = np.zeros((total_samples // surge.getBlockSize(), surge.getBlockSize()))   
-    
+
+#Generate audio/modulate pitch
     surge.playNote(0, 60, 127, 0)       # Middle C Midi = pressed
     pos = 0
     #pitch bend max/min parameters are +7/-7, therefore we must normalize the function output between (+/-)7
@@ -74,6 +81,7 @@ def main():
             pos += 1
     surge.releaseNote(0, 60, 0) #release Middle C
     
+#Convert audio to WAV format
     #must normalize between (-32767 ... 32767) as 16 bit integers (PCM encoding for .wav format)
     #credit to Bartosz Zaczyński at realpython.com (https://realpython.com/python-wav-files/) for their helpful article providing an example to learn from
     audio_max = np.max(np.abs(audio_data))
@@ -86,6 +94,7 @@ def main():
         wavefile.setsampwidth(2)   
         wavefile.setframerate(44100)
         wavefile.writeframes(audio_data.tobytes())
+#Combine animation and audio
     video = VideoFileClip('animation.mp4')
     audio = AudioFileClip('synth_audio.wav')
     combined = video.set_audio(audio)
