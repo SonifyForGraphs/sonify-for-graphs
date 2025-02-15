@@ -1,4 +1,4 @@
-# sonify-for-graphs
+# soundviz
 
 -- Developer Setup Guide
 
