@@ -12,9 +12,9 @@ def main():
 #Generate mathematical function data (to be passed by user in final product):
     function = "y = 2 * (x - floor(x)) - 1"
     x = np.linspace(0, 25 * np.pi, 400) /5 #uncomment /5 for saw, too fast otherwise
-    y = 2 * (x - np.floor(x)) - 1
+    #y = 2 * (x - np.floor(x)) - 1
     #function = "y = sin(x)"
-    #y = np.sin(x)
+    y = np.sin(x)
     #function = "y = x * sin(x)"
     #y = x * np.sin(x)
 
