@@ -101,8 +101,16 @@ const data = {
       icon: BookOpen,
       items: [
         {
-          title: 'Tutorial',
-          url: '/documentation',
+          title: 'Math',
+          url: '/documentation/math',
+        },
+        {
+          title: 'Stocks',
+          url: '/documentation/stocks',
+        },
+        {
+          title: 'Image',
+          url: '/documentation/image',
         },
         /*
         {

@@ -16,7 +16,6 @@ export default function Documentation() {
       <SidebarInset>
         <DocumentationBreadcrumb />
         <div className='flex flex-1 flex-col gap-4 p-4 pt-0'>
-
         </div>
       </SidebarInset>
     </SidebarProvider>
