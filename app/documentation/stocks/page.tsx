@@ -44,7 +44,7 @@ export default function Documentation() {
 
                     {/* Generating Sonification */}
                     <h1 className="text-2xl font-bold mt-6">Generating Your Sonification</h1>
-                    <p>Once all required fields are filled, click <strong>"Sonify!"</strong> to visualize your function or stock data as a graph and convert it into sound.</p>
+                    <p>Once all required fields are filled, click <strong>Sonify!</strong> to visualize your function or stock data as a graph and convert it into sound.</p>
 
                 </div>
             </SidebarInset>
