@@ -127,6 +127,17 @@ const data = {
         },*/
       ],
     },
+    {
+      title: 'Settings',
+      url: '/settings',
+      icon: Settings2, // Make sure to import Settings2 from lucide-react
+      items: [
+        {
+          title: 'Audio Processing',
+          url: '/settings',
+        },
+      ],
+    },
   ],
 };
 

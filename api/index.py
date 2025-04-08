@@ -1,51 +1,17 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import os
-from dotenv import load_dotenv
 
-load_dotenv('.env.local')
-
-print(f'Loaded SURGE_PYTHON_PATH: {os.environ.get('SURGE_PYTHON_PATH', 'Not set')}')
-
-# Import standard modules
 from api.utils import MathWaveSonificationConfig, StocksSonificationConfig
-
-# Check environment variables for Surge configuration
-USE_SURGE = os.environ.get('USE_SURGE', 'true').lower() == 'true'
-USE_REMOTE_SURGE = os.environ.get('USE_REMOTE_SURGE', 'false').lower() == 'true'
-
-# Print configuration for diagnostics
-if USE_SURGE:
-    if USE_REMOTE_SURGE:
-        SURGE_PI_URL = os.environ.get('SURGE_PI_URL', 'http://localhost:8888')
-        print(f"Using remote Surge processing at {SURGE_PI_URL}")
-    else:
-        print("Using local Surge processing (if available)")
-else:
-    print("Using standard tones.py processing (Surge disabled)")
-
-# Import surge-enabled modules if configured to use Surge
-if USE_SURGE:
-    from api.surge_math_wave_sonification import (
-        parse_function, create_animation, create_audio, create_surge_audio, 
-        combine_video_audio, delete_intermediate_files, math_wave_sonify
-    )
-    from api.stocks_sonification import (
-        validate_ticker, create_stocks_animation, create_stocks_audio,
-        combine_stocks_video_audio, delete_intermediate_stocks_files
-    )
-    from api.translation_sonification import create_translation, delete_intermediate_translation_files
-else:
-    # Use standard modules if Surge is disabled
-    from api.math_wave_sonification import (
-        parse_function, create_animation, create_audio,
-        combine_video_audio, delete_intermediate_files, math_wave_sonify
-    )
-    from api.stocks_sonification import (
-        validate_ticker, create_stocks_animation, create_stocks_audio,
-        combine_stocks_video_audio, delete_intermediate_stocks_files
-    )
-    from api.translation_sonification import create_translation, delete_intermediate_translation_files
+from api.math_wave_sonification import (
+    parse_function, create_animation, create_audio, create_surge_audio,
+    combine_video_audio, delete_intermediate_files, math_wave_sonify
+)
+from api.stocks_sonification import (
+    validate_ticker, create_stocks_animation, create_stocks_audio,
+    combine_stocks_video_audio, delete_intermediate_stocks_files
+)
+from api.translation_sonification import create_translation, delete_intermediate_translation_files
 
 app = FastAPI()
 origins = [
@@ -64,16 +30,13 @@ app.add_middleware(
 # MATH STUFF
 @app.post('/math')
 async def math(config: MathWaveSonificationConfig):
-  # run video creation
-  try:
-    # need better error handling here
-    # if an invalid function is provided, the entire operation crashes
-    res = await math_wave_sonify(config=config)
-  except Exception as e:
-    print(f"Error: {e}")
-    return {"result": "fail"}
+    try:
+        res = await math_wave_sonify(config=config)
+    except Exception as e:
+        print(f"Error: {e}")
+        return {"result": "fail"}
 
-  return {"result": res['status'] }
+    return {"result": res['status'] }
 
 @app.post('/math/parse')
 async def parse(config: MathWaveSonificationConfig):
@@ -99,17 +62,13 @@ async def animation(config: MathWaveSonificationConfig):
 
 @app.post('/math/audio')
 async def audio(config: MathWaveSonificationConfig):
-  # create audio - use either standard method or surge depending on imports
-  try:
-    if USE_REMOTE_SURGE:
-      res = await create_surge_audio(config=config)
-    else:
-      res = await create_audio(config=config)
-  except Exception as e:
-    print(f'error creating audio: {e}')
-    return {'status': 'fail'}
-  
-  return {'status': 'success'}
+    try:
+        res = await create_audio(config=config)
+    except Exception as e:
+        print(f'error creating audio: {e}')
+        return {'status': 'fail'}
+    
+    return {'status': 'success'}
 
 @app.post('/math/combine')
 async def combine(config: MathWaveSonificationConfig):
@@ -170,8 +129,9 @@ async def stocks_animation(config: StocksSonificationConfig):
 
 @app.post('/stocks/audio')
 async def stocks_audio(config: StocksSonificationConfig):
-  # create audio
+  # create audio with the appropriate method based on config
   try:
+    print(f"Creating stocks audio with processing type: {config.audioProcessing if hasattr(config, 'audioProcessing') else 'default'}")
     res = await create_stocks_audio(config=config)
   except Exception as e:
     print(f'error creating audio: {e}')
@@ -191,7 +151,7 @@ async def stocks_combine(config: StocksSonificationConfig):
   return {'status': 'success'}
 
 @app.post('/stocks/delete')
-async def delete(config: StocksSonificationConfig):
+async def delete_stocks(config: StocksSonificationConfig):
   # delete all created files
   try:
     res = await delete_intermediate_stocks_files(config=config)

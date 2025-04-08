@@ -8,6 +8,8 @@ from moviepy.editor import VideoFileClip, AudioFileClip
 from api.utils import StocksSonificationConfig
 from pathlib import Path
 import yfinance as yf
+import requests
+import wave
 
 # step 1. validate stock
 async def validate_ticker(config: StocksSonificationConfig):
@@ -49,8 +51,8 @@ async def create_stocks_animation(config: StocksSonificationConfig):
   plt.close(fig)
   return {'status': 'success'}
 
-# step 3. create audio
-async def create_stocks_audio(config: StocksSonificationConfig):
+# step 3a. create audio with tones
+async def create_stocks_tones_audio(config: StocksSonificationConfig):
   ticker = yf.Ticker(config.ticker)
   hist = ticker.history(period='2y')
   x = np.array([i for i in range(len(hist))])
@@ -87,14 +89,138 @@ async def create_stocks_audio(config: StocksSonificationConfig):
   mixer.write_wav(output_dir + '/tones.wav')
   return {'status': 'success'}
 
+# step 3b. create audio with local surge
+async def create_stocks_surge_audio_local(config: StocksSonificationConfig):
+    # Try to import Surge only when this function is called
+    try:
+        import sys
+        # Use the path provided in the request
+        if hasattr(config, 'surgePath') and config.surgePath:
+            surge_path = config.surgePath
+            sys.path.append(surge_path)
+            
+        # Now try to import Surge
+        import surgepy
+        from surgepy import constants as srgco
+        
+        # Get stock data
+        ticker = yf.Ticker(config.ticker)
+        hist = ticker.history(period='2y')
+        x = np.array([i for i in range(len(hist))])
+        y = np.array([row['Close'] for _, row in hist.iterrows()])
+        
+        video_time = len(y) / config.fps
+        sample_rate = 44100
+    
+        surge = surgepy.createSurge(sample_rate)
+        
+        # Configure Surge synthesizer
+        surge.loadPatch(os.path.join("C:\\Users\\nickl\\Documents\\surge-demo\\surge\\resources\\data\\", "patches_factory\\Polysynths\\Licht.fxp"))
+        cg_Global = surge.getControlGroup(srgco.cg_GLOBAL)
+        globalEnts = cg_Global.getEntries()
+        globalPar = globalEnts[1].getParams()
+        pitch = globalPar[1]  # global scene pitch parameter
+        
+        # Normalize stock values to 0-1 range
+        min_value = min(y)
+        max_value = max(y)
+        value_range = max_value - min_value
+        normalized_values = [(v - min_value) / value_range for v in y]
+        
+        # Calculate blocks needed for audio
+        blocks_per_frame = int(sample_rate // config.fps // surge.getBlockSize())
+        total_samples = int(np.ceil(video_time * sample_rate))
+        audio_data = np.zeros((total_samples // surge.getBlockSize(), surge.getBlockSize()))
+        
+        # Generate audio
+        surge.playNote(0, 60, 127, 0)  # Middle C Midi note
+        pos = 0
+        
+        # Map stock data to pitch bend values
+        for i, value in enumerate(normalized_values):
+            pitch_bend_amount = value * 14 - 7  # Scale to range -7 to +7
+            surge.setParamVal(pitch, pitch_bend_amount)
+            
+            for _ in range(blocks_per_frame):
+                surge.process()
+                audio_data[pos, :] = surge.getOutput()[0, :]
+                pos += 1
+                
+        surge.releaseNote(0, 60, 0)
+        
+        # Normalize and format audio data
+        audio_max = np.max(np.abs(audio_data))
+        audio_data /= audio_max
+        audio_data = (audio_data * 32767).astype(np.int16)
+
+        # Save audio file
+        output_filename = 'public/animations/tones.wav'
+        with wave.open(output_filename, 'w') as wavefile:
+            wavefile.setnchannels(1) 
+            wavefile.setsampwidth(2)   
+            wavefile.setframerate(44100)
+            wavefile.writeframes(audio_data.tobytes())
+
+        return {'status': 'success'}
+    except ImportError as error:
+        print(f"Failed to import Surge: {error}")
+        print("Falling back to tones")
+        return await create_stocks_tones_audio(config)
+
+# step 3c. create audio with remote surge
+async def create_stocks_surge_audio_remote(config: StocksSonificationConfig, remote_url='http://localhost:8888'):
+    try:
+        # Get stock data for remote processing
+        ticker = yf.Ticker(config.ticker)
+        hist = ticker.history(period='2y')
+        close_prices = [float(row['Close']) for _, row in hist.iterrows()]
+        
+        # Prepare the data to send
+        data = {
+            "ticker": config.ticker,
+            "prices": close_prices,
+            "fps": config.fps
+        }
+        
+        # Send request to remote server
+        response = requests.post(f"{remote_url}/stocks_audio", json=data, timeout=30)
+        
+        if response.status_code != 200:
+            print(f"Error from remote Surge server: {response.text}")
+            print("Falling back to local tones.py method")
+            return await create_stocks_tones_audio(config)
+        
+        # Save the received WAV file
+        output_dir = 'public/animations'
+        os.makedirs(output_dir, exist_ok=True)
+        
+        with open(os.path.join(output_dir, 'tones.wav'), 'wb') as f:
+            f.write(response.content)
+        
+        return {'status': 'success'}
+    except Exception as e:
+        print(f"Error with remote Surge processing: {e}")
+        print("Falling back to local tones.py method")
+        return await create_stocks_tones_audio(config)
+
+# step 3. create audio - main function that selects the appropriate method
+async def create_stocks_audio(config: StocksSonificationConfig):
+    """Create audio using the method specified in the config."""
+    if hasattr(config, 'audioProcessing'):
+        if config.audioProcessing == 'surge-local':
+            return await create_stocks_surge_audio_local(config)
+        elif config.audioProcessing == 'surge-remote':
+            remote_url = config.remoteURL if hasattr(config, 'remoteURL') and config.remoteURL else 'http://localhost:8888'
+            return await create_stocks_surge_audio_remote(config, remote_url)
+    
+    # Default to tones.py
+    return await create_stocks_tones_audio(config)
 
 # step 4. combine video and audio
 async def combine_stocks_video_audio(config: StocksSonificationConfig):
   # combine audio and video
   output_dir = 'public/animations'
-  print('before video')
   video = VideoFileClip(output_dir + '/animation.mp4')
-  print('after video')
   audio = AudioFileClip(output_dir + '/tones.wav')
   combined = video.set_audio(audio)
   
@@ -109,7 +235,6 @@ async def combine_stocks_video_audio(config: StocksSonificationConfig):
   video.close()
   audio.close()
   return {'status': 'success'}
-
 
 # step 5. delete intermediate video, audio, and final video
 async def delete_intermediate_stocks_files(config: StocksSonificationConfig):

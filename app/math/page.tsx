@@ -65,7 +65,13 @@ export default function Page() {
   const { toast, dismiss } = useToast();
   const toastIDRef = useRef<string | null>(null);
   const dismissRef = useRef(dismiss);
-
+  
+  const [audioSettings, setAudioSettings] = useState({
+      audioSource: 'tones',
+      surgePath: '',
+      remoteUrl: 'http://localhost:8888'
+  });
+  
   useEffect(() => {
     dismissRef.current = dismiss;
   }, [dismiss]);
@@ -90,6 +96,12 @@ export default function Page() {
     }
   }, [status, toast]);
 
+    useEffect(() => {
+      const savedSettings = localStorage.getItem('sonificationSettings');
+      if (savedSettings) {
+        setAudioSettings(JSON.parse(savedSettings));
+      }
+    }, []);
   // form
   const form = useForm<z.infer<typeof FormSchema>>({
     defaultValues: {
@@ -119,6 +131,12 @@ export default function Page() {
       description: <ToastDescription {...status} />,
     });
 
+    const requestData = {
+      ...formData,
+      audioProcessing: audioSettings.audioSource,
+      surgePath: audioSettings.surgePath,
+      remoteUrl: audioSettings.remoteUrl
+    };
     // parse function to make sure it's valid
     try {
       const response = await fetch('http://localhost:8000/math/parse', {
@@ -126,7 +144,7 @@ export default function Page() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(requestData),
       });
 
       const responseData = await response.json();
@@ -156,7 +174,7 @@ export default function Page() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(requestData),
       });
 
       const responseData = await response.json();
@@ -186,7 +204,7 @@ export default function Page() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(requestData),
       });
 
       const responseData = await response.json();
@@ -215,7 +233,7 @@ export default function Page() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(requestData),
       });
 
       const responseData = await response.json();
@@ -286,7 +304,7 @@ export default function Page() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(requestData),
       });
 
       const responseData = await response.json();

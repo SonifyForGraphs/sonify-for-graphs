@@ -39,6 +39,13 @@ export default function Page() {
   const [userId, setUserId] = useState('');
   const [videos, setVideos] = useState<FileObject[]>([]);
 
+  // audio processing settings
+  const [audioSettings, setAudioSettings] = useState({
+    audioSource: 'tones',
+    surgePath: '',
+    remoteUrl: 'http://localhost:8888',
+  });
+
   // floating action button dialog
   const [openFAB, setOpenFAB] = useState(false);
 
@@ -60,6 +67,20 @@ export default function Page() {
     videoCreated: null,
     uploadedToSupabase: null,
   });
+
+  // Load audio settings from localStorage
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('sonificationSettings');
+    if (savedSettings) {
+      try {
+        const parsedSettings = JSON.parse(savedSettings);
+        setAudioSettings(parsedSettings);
+        console.log("Loaded audio settings:", parsedSettings);
+      } catch (error) {
+        console.error("Error parsing settings:", error);
+      }
+    }
+  }, []);
 
   // toast stuff
   const { toast, dismiss } = useToast();
@@ -120,6 +141,16 @@ export default function Page() {
       description: <ToastDescription {...status} />,
     });
 
+    // Add audio processing settings to the form data
+    const dataWithSettings = {
+      ...formData,
+      audioProcessing: audioSettings.audioSource,
+      surgePath: audioSettings.surgePath,
+      remoteURL: audioSettings.remoteUrl,
+    };
+
+    console.log("Sending request with audio settings:", dataWithSettings);
+
     // make sure ticker is valid
     try {
       const response = await fetch('http://localhost:8000/stocks/ticker', {
@@ -127,7 +158,7 @@ export default function Page() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataWithSettings),
       });
 
       const responseData = await response.json();
@@ -145,7 +176,7 @@ export default function Page() {
         return;
       }
     } catch (error) {
-      console.log('Sup Error:', error);
+      console.log('Ticker Error:', error);
     }
     // valid ticker
     setStatus((prev) => ({ ...prev, validTicker: true }));
@@ -157,7 +188,7 @@ export default function Page() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataWithSettings),
       });
 
       const responseData = await response.json();
@@ -174,7 +205,7 @@ export default function Page() {
         return;
       }
     } catch (error) {
-      console.log('Sup Error:', error);
+      console.log('Animation Error:', error);
     }
 
     // animation created successfully
@@ -187,7 +218,7 @@ export default function Page() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataWithSettings),
       });
 
       const responseData = await response.json();
@@ -203,7 +234,7 @@ export default function Page() {
         return;
       }
     } catch (error) {
-      console.log('Sup Error:', error);
+      console.log('Audio Error:', error);
     }
 
     // audio created successfully
@@ -216,7 +247,7 @@ export default function Page() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataWithSettings),
       });
 
       const responseData = await response.json();
@@ -231,7 +262,7 @@ export default function Page() {
         return;
       }
     } catch (error) {
-      console.log('Sup Error:', error);
+      console.log('Combine Error:', error);
     }
 
     // video created successfully
@@ -287,7 +318,7 @@ export default function Page() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataWithSettings),
       });
 
       const responseData = await response.json();
@@ -305,8 +336,7 @@ export default function Page() {
     setStatus((prev) => {
       return {
         ...prev,
-
-        validFunction: null,
+        validTicker: null,
         animationCreated: null,
         audioCreated: null,
         videoCreated: null,
@@ -350,7 +380,6 @@ export default function Page() {
       <SidebarInset>
         <StocksBreadCrumb />
         <div className='flex flex-1 flex-col gap-4 p-4 pt-0'>
-          {/*<FloatingActionButton openFAB={openFAB} setOpenFAB={setOpenFAB} form={form} />*/}
           <Dialog open={openFAB} onOpenChange={setOpenFAB}>
             <DialogTrigger asChild>
               <Button
