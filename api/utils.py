@@ -1,5 +1,5 @@
 # math sonification configuration
-from typing import Optional
+from typing import Optional, Dict, Any
 import numpy as np
 from pydantic import BaseModel
 
@@ -26,7 +26,9 @@ class MathWaveSonificationConfig(BaseModel):
   fps: Optional[int] = 30 # make sure greater than 0
 
   # audio
-  # will add in once everything else is working. right now just default will suffice.
+  audioProcessing: Optional[str] = ''
+  surgePath: Optional[str] = ''
+  remoteURL: Optional[str] = ''
 
 
 
@@ -47,4 +49,6 @@ class StocksSonificationConfig(BaseModel):
   fps: Optional[int] = 30 # make sure greater than 0
 
   # audio
-  # will add in once everything else is working. right now just default will suffice.
+  audioProcessing: Optional[str] = ''
+  surgePath: Optional[str] = ''
+  remoteURL: Optional[str] = ''
