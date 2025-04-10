@@ -42,7 +42,7 @@ const FormSchema = z.object({
 
 export default function Settings() {
   const { toast } = useToast();
-  const [initialValues, setInitialValues] = useState({
+  const [initialValues, setInitialValues] = useState<z.infer<typeof FormSchema>>({
     audioSource: 'tones',
     surgePath: '',
     remoteUrl: 'http://localhost:8888',
